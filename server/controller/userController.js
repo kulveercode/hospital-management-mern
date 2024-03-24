@@ -47,3 +47,31 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
     message: "user registered!",
   });
 });
+
+export const login = catchAsyncErrors(async (req, res, next) => {
+  const { email, password, confirmPassword, role } = req.body;
+  if (!email || !password || !confirmPassword || !role) {
+    return next(new ErrorHandler("Please provide all details", 400));
+  }
+  if (password !== confirmPassword) {
+    return next(
+      new ErrorHandler("Password and confirm password doesn't match", 400)
+    );
+  }
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    return next(new ErrorHandler("Invalid username or password", 401));
+  }
+
+  const isPasswordMatched = await user.comparePassword(password);
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Invalid username or password", 401));
+  }
+  if (role !== user.role) {
+    return next(new ErrorHandler("Invalid role", 401));
+  }
+  res.status(200).json({
+    success: true,
+    message: "User Logged In Successfully !",
+  });
+});
