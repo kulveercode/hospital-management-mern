@@ -1,6 +1,7 @@
 import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
 import ErrorHandler from "../middleware/errorMiddleware.js";
 import { User } from "../models/userSchema.js";
+import { generateToken } from "../utils/jwtToken.js";
 
 export const patientRegister = catchAsyncErrors(async (req, res, next) => {
   const {
@@ -42,10 +43,7 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
     nic,
     role,
   });
-  res.status(200).json({
-    success: true,
-    message: "user registered!",
-  });
+generateToken(user, "User registered successfully", 200, res);
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
@@ -70,8 +68,5 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   if (role !== user.role) {
     return next(new ErrorHandler("Invalid role", 401));
   }
-  res.status(200).json({
-    success: true,
-    message: "User Logged In Successfully !",
-  });
+  generateToken(user, "User Logged In Successfully", 200, res);
 });
