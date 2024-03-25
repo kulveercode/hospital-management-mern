@@ -43,7 +43,7 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
     nic,
     role,
   });
-generateToken(user, "User registered successfully", 200, res);
+  generateToken(user, "User registered successfully", 200, res);
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
@@ -69,4 +69,40 @@ export const login = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid role", 401));
   }
   generateToken(user, "User Logged In Successfully", 200, res);
+});
+
+export const addNewAdmin = catchAsyncErrors(async (req, res, next) => {
+  const { firstName, lastName, email, phone, password, gender, dob, nic } =
+    req.body;
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !phone ||
+    !password ||
+    !gender ||
+    !dob ||
+    !nic
+  ) {
+    return next(new ErrorHandler("Please enter all the fields", 400));
+  }
+  const isRegistered = await User.findOne({ email });
+  if (isRegistered) {
+    return next(new ErrorHandler(`${isRegistered.role} is already with this email registered}`));
+  }
+  const admin = await User.create({
+    firstName,
+    lastName,
+    email,
+    phone,
+    password,
+    gender,
+    dob,
+    nic,
+    role: "Admin",
+  });
+  res.status(200).json({
+    success: true,
+    message: "Admin added successfully",
+  })
 });
