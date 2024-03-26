@@ -88,7 +88,11 @@ export const addNewAdmin = catchAsyncErrors(async (req, res, next) => {
   }
   const isRegistered = await User.findOne({ email });
   if (isRegistered) {
-    return next(new ErrorHandler(`${isRegistered.role} is already with this email registered}`));
+    return next(
+      new ErrorHandler(
+        `${isRegistered.role} is already with this email registered}`
+      )
+    );
   }
   const admin = await User.create({
     firstName,
@@ -104,5 +108,5 @@ export const addNewAdmin = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Admin added successfully",
-  })
+  });
 });
